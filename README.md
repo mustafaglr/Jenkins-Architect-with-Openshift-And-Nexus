@@ -1,6 +1,6 @@
 # Jenkins Architecture with Openshift and Nexus
 
-## The lifec ycle of proccess : 
+## The life cycle of proccess : 
 
 ![Arc](https://github.com/mustafaglr/Jenkins-Architecture-with-Openshift-And-Nexus/blob/master/images/arcforgithub-1.jpg)
 
@@ -20,27 +20,27 @@
 
 ## Change variables to use correctly
 
-Jenkinsfile : 
-  DEVOPS_PROJECT
-  PROJECT
-  OPENSHIFT_USER
-  NEXUS_URL
-  REPOSITORY_NAME
-  BITBUCKET_DEVOPS_PROJECT_HTTP_URL
-  NEXUS_DOCKER_REGISTRY_URL
-  PROJECT_NAME
-  BITBUCKET_PROJECT_URL_WITHOUT_REPOSITORY_NAME
-  BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME
-  "fill 'KUBERNETES_SERVICE_HOST' "
-
-JenkinsfileInBranch :
-  CREDENTIALS_ID
-  BITBUCKET_DEVOPS_PROJECT_HTTP_URL
+Jenkinsfile :  
+  DEVOPS_PROJECT  
+  PROJECT  
+  OPENSHIFT_USER  
+  NEXUS_URL  
+  REPOSITORY_NAME  
+  BITBUCKET_DEVOPS_PROJECT_HTTP_URL  
+  NEXUS_DOCKER_REGISTRY_URL  
+  PROJECT_NAME  
+  BITBUCKET_PROJECT_URL_WITHOUT_REPOSITORY_NAME  
+  BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME  
+  "fill 'KUBERNETES_SERVICE_HOST' "  
   
-Dockerfileui :
-  NEXUS_USERNAME
-  NEXUS_PASSWORD
-
-
+JenkinsfileInBranch :  
+  CREDENTIALS_ID  
+  BITBUCKET_DEVOPS_PROJECT_HTTP_URL  
+  
+Dockerfileui :  
+  NEXUS_USERNAME  
+  NEXUS_PASSWORD  
+  
+  
 # ENJOY!
 
