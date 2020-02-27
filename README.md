@@ -1,14 +1,14 @@
 # Jenkins Architecture with Openshift and Nexus
 
-## The life cycle of proccess : 
+## The life cycle of proccess 
 
 ![Arc](https://github.com/mustafaglr/Jenkins-Architecture-with-Openshift-And-Nexus/blob/master/images/arcforgithub-1.jpg)
 
-## Explanation of life cycle : 
+## Explanation of life cycle 
 
 ![Arc-1](https://github.com/mustafaglr/Jenkins-Architecture-with-Openshift-And-Nexus/blob/master/images/arcforgithub-2.jpg)
 
-## Must Change on Project : 
+## Must Change on Project 
 
 ![Arc-3](https://github.com/mustafaglr/Jenkins-Architecture-with-Openshift-And-Nexus/blob/master/images/arcforgithub-3.jpg)
 
