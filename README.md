@@ -18,6 +18,8 @@
 
 ![Arc-5](https://github.com/mustafaglr/Jenkins-Architecture-with-Openshift-And-Nexus/blob/master/images/arcforgithub-5.jpg)
 
+"JenkinsfileInBranch" is in the every branch of every project. It only loads Generic Pipeline which is stored on Devops project. Every changes on Generic Pipeline will be applied when "JenkinsfileInBranch" is running. Because "JenkinsfileInBranch" only loads.
+
 ## Change variables to use correctly
 
 #### Jenkinsfile :  
