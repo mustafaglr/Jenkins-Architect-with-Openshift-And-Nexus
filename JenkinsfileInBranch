@@ -1,0 +1,7 @@
+node {
+    git branch: 'master',
+        credentialsId: 'CREDENTIALS_ID',
+        url: 'BITBUCKET_DEVOPS_PROJECT_HTTP_URL'
+    load 'OpenShiftTemplates/Jenkinsfile'
+
+}

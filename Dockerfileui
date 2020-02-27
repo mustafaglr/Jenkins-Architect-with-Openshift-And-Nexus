@@ -1,0 +1,12 @@
+FROM bitnami/nginx
+
+COPY nginx.conf /opt/bitnami/nginx/conf/nginx.conf
+USER root
+WORKDIR /usr/share/nginx/html
+RUN curl --insecure -o dist.tar.gz $ARTIFACT_URL -u NEXUS_USERNAME:NEXUS_PASSWORD
+RUN ls && pwd
+RUN tar -xvf dist.tar.gz  && \
+    mv -f dist/* . && \
+    rm -rf dist dist.tar.gz
+USER 1001
+EXPOSE 8080
