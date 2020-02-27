@@ -20,9 +20,9 @@
 
 ## Change variables to use correctly
 
-Jenkinsfile :  
-  DEVOPS_PROJECT  
-  PROJECT  
+#### Jenkinsfile :  
+    DEVOPS_PROJECT  
+    PROJECT  
   OPENSHIFT_USER  
   NEXUS_URL  
   REPOSITORY_NAME  
@@ -33,11 +33,11 @@ Jenkinsfile :
   BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME  
   "fill 'KUBERNETES_SERVICE_HOST' "  
   
-JenkinsfileInBranch :  
+#### JenkinsfileInBranch :  
   CREDENTIALS_ID  
   BITBUCKET_DEVOPS_PROJECT_HTTP_URL  
   
-Dockerfileui :  
+#### Dockerfileui :  
   NEXUS_USERNAME  
   NEXUS_PASSWORD  
   
