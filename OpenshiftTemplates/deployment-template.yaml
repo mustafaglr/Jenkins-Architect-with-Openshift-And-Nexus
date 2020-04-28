@@ -68,12 +68,6 @@ objects:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: ${PROFILE_NAME}
-            - name: APPDYNAMICS_NETVIZ_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: APPDYNAMICS_NETVIZ_AGENT_PORT
-              value: '3892'
           resources:
             requests:
               memory: 256Mi
