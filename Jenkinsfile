@@ -1,5 +1,3 @@
-
-
 def openshiftDevOpsCredentials = "openshift_token_for_default_account_dev"
 def openshiftEnvCredentials = "openshift_token_for_default_account_dev"
 def openshiftTestCredentials = "openshift_token_for_default_account_test"
