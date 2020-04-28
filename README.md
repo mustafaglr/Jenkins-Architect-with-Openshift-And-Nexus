@@ -24,7 +24,9 @@
 
 #### Jenkinsfile :  
     DEVOPS_PROJECT  
-    PROJECT  
+    PROJECT
+    CLUSTER
+    PROD_CLUSTER
     OPENSHIFT_USER  
     NEXUS_URL  
     REPOSITORY_NAME  
