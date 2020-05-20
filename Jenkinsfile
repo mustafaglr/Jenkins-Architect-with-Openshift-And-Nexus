@@ -65,26 +65,26 @@ pipeline{
                     openshiftEnvCredentials = openshiftDevCredentials
                   }                  
                   if(branchName == "dev"){
-                    profileName = ""
+                    profileName = "dev"
                     project = devProject
                     openshiftDevOpsCredentials = openshiftDevCredentials
                     openshiftEnvCredentials = openshiftDevCredentials
                   }
                   else if(branchName == "test"){
-                    profileName = ""
+                    profileName = "test"
                     project = testProject
                     openshiftDevOpsCredentials = openshiftTestCredentials
                     openshiftEnvCredentials = openshiftTestCredentials
                   }
                   
                   else if(branchName == "hotfix"){
-                    profileName = ""
+                    profileName = "hotfix"
                     project = hotfixProject
                     openshiftDevOpsCredentials = openshiftHfCredentials
                     openshiftEnvCredentials = openshiftHfCredentials
                   }
                   else if(branchName == "prod"){
-                    profileName = ""
+                    profileName = "prod"
                     project = devProject
                     openshiftDevOpsCredentials = openshiftDevCredentials
                     openshiftEnvCredentials = openshiftProdCredentials
@@ -119,10 +119,6 @@ pipeline{
 	          }
                   
                   
-                  if(repoName == "sot-product-ms" || repoName == "sot-usageinfo-ms" || repoName == "sot-service-registry"){
-                    profileName = branchName
-                    
-                  }
 		  dir('devops') {
                       git(url: "${devOpsUrl}", branch: "${devOpsUrlBranch}", credentialsId: "${openshiftCredentials}")
 		  }                    
@@ -136,8 +132,8 @@ pipeline{
 		    appVersion = "${branchName}-${currentBuild.number}"
                     env.TAG_VERSION = "${pom.version}"
                   
-                    configFileProvider([configFile(fileId: '11c4b96d-4fec-4599-983f-abbc76085ef1', variable: 'MAVEN_SETTINGS_XML'),
-                                       configFile(fileId: '765e29a7-d68d-46e4-991c-b9dee8216d6a', variable: 'MAVEN_SETTINGS_PRI_XML')]) {
+                    configFileProvider([configFile(fileId: '', variable: 'MAVEN_SETTINGS_XML'),
+                                       configFile(fileId: '', variable: 'MAVEN_SETTINGS_PRI_XML')]) {
                       sh "mvn clean install -f ${repoSubFolder}pom.xml -B -Dmaven.test.failure.ignore -s $MAVEN_SETTINGS_XML -DskipTests -Dversion=${appVersion}"
                       sh "mvn deploy -s $MAVEN_SETTINGS_PRI_XML -f ${repoSubFolder}pom.xml -DskipTests -Dversion=${appVersion}"
                     }
@@ -153,7 +149,7 @@ pipeline{
                   def sources = "${repoSubFolder}src"
                   if(branchName != "prod"){
                 	  print "Sonar Analysis is started!"
-                      configFileProvider([configFile(fileId: '11c4b96d-4fec-4599-983f-abbc76085ef1', variable: 'MAVEN_SETTINGS_XML')]) {
+                      configFileProvider([configFile(fileId: '', variable: 'MAVEN_SETTINGS_XML')]) {
                          sh "mvn sonar:sonar -s $MAVEN_SETTINGS_XML -f ${repoSubFolder}pom.xml"
                       }
                   }
