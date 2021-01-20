@@ -120,18 +120,6 @@ parameters:
   description: spring profile name
   value: vodafone
   required: false
-- name: MONGODB_HOST
-  displayName: mongodb hostname
-  description: mongodb hostname
-  required: false
-- name: MONGODB_DATABASE
-  displayName: mongodb database name
-  description: mongodb database name
-  required: false
-- name: MONGODB_USERPWD
-  displayName: config map for mongodb username and password
-  description: config map for mongodb username and password
-  required: false
 - name: HOST_NAME
   displayName: Domain name for routh url
   description: Domain name for routh url
