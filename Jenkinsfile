@@ -27,7 +27,7 @@ def appdynamicsAccessKey = ""
 
 def nexusDockerRegistryUrl = "NEXUS_DOCKER_REGISTRY_URL/PROJECT_NAME"
 def artifactUrlPrefix="http://NEXUS_URL/repository/REPOSITORY_NAME/"
-def fromImage = "PRIVATE_REGISTRY/openjdk:8-jre-alpine"
+def fromImage = "NEXUS_DOCKER_REGISTRY_URL/openjdk:8-jre-alpine"
 
 def repoUrl = "BITBUCKET_PROJECT_URL_WITHOUT_REPOSITORY_NAME"
 def bitbucketSshUrl = "BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME"
