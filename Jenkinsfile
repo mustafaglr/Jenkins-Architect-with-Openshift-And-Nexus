@@ -23,7 +23,6 @@ def routePath = ""
 def hostName = ""
 def memoryLimit = ""
 def cpuLimit = ""
-def appdynamicsAccessKey = ""
 
 def nexusDockerRegistryUrl = "NEXUS_DOCKER_REGISTRY_URL/PROJECT_NAME"
 def artifactUrlPrefix="http://NEXUS_URL/repository/REPOSITORY_NAME/"
@@ -34,8 +33,6 @@ def bitbucketSshUrl = "BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME"
 def devOpsUrl = "BITBUCKET_DEVOPS_PROJECT_HTTP_URL"
 def devOpsUrlBranch = "master"
 def branchName = ""
-def appdynamicsUrl = "BITBUCKET_APPDYNAMICS_PROJECT_HTTP_URL"
-def appdynamicsUrlBranch = "master"
 
 def jv_home = "$JAVA_HOME"
 
@@ -179,16 +176,8 @@ pipeline{
                             print "ARTIFACT URL:"
                             artifactUrl = artifactUrlPrefix + pomGroupId + "/${artifactId}/${appVersion}/${artifactId}-${appVersion}.jar"
                             print artifactUrl
-                                    
-                            if (branchName == "prod") {
-                                dir('appdynamics') {
-                                      git(url: "${appdynamicsUrl}", branch: "${appdynamicsUrlBranch}", credentialsId: "${openshiftCredentials}")
-                            	}  
-                          	openshift.raw("set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion} APPDYNAMICS_KEY=${appdynamicsAccessKey} BRANCH_NAME=${branchName}")
-                            }else{
-                                     
-                                openshift.raw("set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion}  BRANCH_NAME=${branchName}")
-                            }
+                                      
+                            openshift.raw("set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion}  BRANCH_NAME=${branchName}")
                         		    
                             openshift.startBuild("${appName}", '--from-dir .', '--follow')
                         }
