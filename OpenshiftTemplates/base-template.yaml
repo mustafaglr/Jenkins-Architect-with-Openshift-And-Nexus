@@ -38,6 +38,12 @@ objects:
         name: ${SOURCE_SECRET_NAME}
       type: Git
     strategy:
+      dockerStrategy:
+        from:
+          kind: DockerImage
+          name: ${FROM_IMAGE}
+        pullSecret:
+          name: ${PUSH_SECRET}
       type: Docker
 parameters:
 - name: APP_NAME
@@ -79,3 +85,8 @@ parameters:
   displayName: Path for Dockerfile
   description: Path for Dockerfile
   required: false
+- name: FROM_IMAGE
+  displayName: FROM IMAGE
+  description: From image used in your dockerfile
+  value: nginx:latest
+  required: true
