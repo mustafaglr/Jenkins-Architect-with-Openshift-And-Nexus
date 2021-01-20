@@ -1,5 +1,5 @@
-def openshiftDevOpsCredentials = "openshift_token_for_default_account_dev"
-def openshiftEnvCredentials = "openshift_token_for_default_account_dev"
+def openshiftBuildCredentials = "openshift_token_for_default_account_dev"
+def openshiftDeployCredentials = "openshift_token_for_default_account_dev"
 def openshiftTestCredentials = "openshift_token_for_default_account_test"
 def openshiftDevCredentials = "openshift_token_for_default_account_dev"
 def openshiftHfCredentials = "openshift_token_for_default_account_hf"
@@ -23,17 +23,21 @@ def routePath = ""
 def hostName = ""
 def memoryLimit = ""
 def cpuLimit = ""
+def appdynamicsAccessKey = ""
 
 def nexusDockerRegistryUrl = "NEXUS_DOCKER_REGISTRY_URL/PROJECT_NAME"
 def artifactUrlPrefix="http://NEXUS_URL/repository/REPOSITORY_NAME/"
+def fromImage = "PRIVATE_REGISTRY/openjdk:8-jre-alpine"
 
 def repoUrl = "BITBUCKET_PROJECT_URL_WITHOUT_REPOSITORY_NAME"
 def bitbucketSshUrl = "BITBUCKET_SSH_URL_WITHOUT_REPOSITORY_NAME"
 def devOpsUrl = "BITBUCKET_DEVOPS_PROJECT_HTTP_URL"
 def devOpsUrlBranch = "master"
 def branchName = ""
+def appdynamicsUrl = "BITBUCKET_APPDYNAMICS_PROJECT_HTTP_URL"
+def appdynamicsUrlBranch = "master"
 
-
+def jv_home = "$JAVA_HOME"
 
 pipeline{
   agent any
@@ -56,38 +60,38 @@ pipeline{
                   repoUrl = "${repoUrl}${repoName}.git"
                   bitbucketSshUrl = "${bitbucketSshUrl}${repoName}.git"
                   
-		  notifyStarted(repoName,branchName)
+		  		  
                   
                   if(branchName == "master"){
                     profileName = ""
                     project = devProject
-                    openshiftDevOpsCredentials = openshiftDevCredentials
-                    openshiftEnvCredentials = openshiftDevCredentials
+                    openshiftBuildCredentials = openshiftDevCredentials
+                    openshiftDeployCredentials = openshiftDevCredentials
                   }                  
                   if(branchName == "dev"){
                     profileName = "dev"
                     project = devProject
-                    openshiftDevOpsCredentials = openshiftDevCredentials
-                    openshiftEnvCredentials = openshiftDevCredentials
+                    openshiftBuildCredentials = openshiftDevCredentials
+                    openshiftDeployCredentials = openshiftDevCredentials
                   }
                   else if(branchName == "test"){
                     profileName = "test"
                     project = testProject
-                    openshiftDevOpsCredentials = openshiftTestCredentials
-                    openshiftEnvCredentials = openshiftTestCredentials
+                    openshiftBuildCredentials = openshiftTestCredentials
+                    openshiftDeployCredentials = openshiftTestCredentials
                   }
                   
                   else if(branchName == "hotfix"){
                     profileName = "hotfix"
                     project = hotfixProject
-                    openshiftDevOpsCredentials = openshiftHfCredentials
-                    openshiftEnvCredentials = openshiftHfCredentials
+                    openshiftBuildCredentials = openshiftHfCredentials
+                    openshiftDeployCredentials = openshiftHfCredentials
                   }
                   else if(branchName == "prod"){
                     profileName = "prod"
                     project = devProject
-                    openshiftDevOpsCredentials = openshiftDevCredentials
-                    openshiftEnvCredentials = openshiftProdCredentials
+                    openshiftBuildCredentials = openshiftDevCredentials
+                    openshiftDeployCredentials = openshiftProdCredentials
                     cluster = 'PROD_CLUSTER'
                   }
                   else{
@@ -96,6 +100,8 @@ pipeline{
                      
                   }
                   
+                  notifyStarted(repoName,branchName)
+                  
                   def conf = readProperties  file: 'pipelineconfig'
                   routePath = conf['routePath']
                   appName = conf['appName']
@@ -103,40 +109,44 @@ pipeline{
                   cpuLimit = conf['cpuLimit']
                   
                   if (branchName == "master") {
-	              hostName = conf['masterHostName']
-	          }
+	              	  hostName = conf['masterHostName']
+                  }
                   if (branchName == "dev") {
-	              hostName = conf['devHostName']
-	          }
-	          if (branchName == "test") {
-		      hostName = conf['testHostName']
-	          }
-	          if (branchName == "hotfix") {
-		      hostName = conf['hfHostName']
-	          }
-		  if (branchName == "prod") {
-	              hostName = conf['prodHostName']
-	          }
+                      hostName = conf['devHostName']
+                  }
+                  if (branchName == "test") {
+                 	 hostName = conf['testHostName']
+                  }
+                  if (branchName == "hotfix") {
+                  	 hostName = conf['hfHostName']
+                  }
+              	  if (branchName == "prod") {
+                     hostName = conf['prodHostName']
+                  }
                   
                   
-		  dir('devops') {
-                      git(url: "${devOpsUrl}", branch: "${devOpsUrlBranch}", credentialsId: "${openshiftCredentials}")
-		  }                    
+                  dir('devops') {
+                              git(url: "${devOpsUrl}", branch: "${devOpsUrlBranch}", credentialsId: "${openshiftCredentials}")
+                  }                    
                     
-		    stash includes: "devops/OpenShiftTemplates/**/*", name: 'osTemplates'
+                  stash includes: "devops/OpenShiftTemplates/**/*", name: 'osTemplates'
+
+                  def pom = readMavenPom file: "${repoSubFolder}pom.xml"
+                  artifactId = pom.artifactId
+                  pomGroupId = pom.groupId
+                  pomGroupId = pomGroupId.replace(".", "/")
+		  appVersion = "${branchName}-${currentBuild.number}"
+                  env.TAG_VERSION = "${pom.version}"
                   
-		    def pom = readMavenPom file: "${repoSubFolder}pom.xml"
-                    artifactId = pom.artifactId
-                    pomGroupId = pom.groupId
-                    pomGroupId = pomGroupId.replace(".", "/")
-		    appVersion = "${branchName}-${currentBuild.number}"
-                    env.TAG_VERSION = "${pom.version}"
-                  
-                    configFileProvider([configFile(fileId: '', variable: 'MAVEN_SETTINGS_XML'),
-                                       configFile(fileId: '', variable: 'MAVEN_SETTINGS_PRI_XML')]) {
-                      sh "mvn clean install -f ${repoSubFolder}pom.xml -B -Dmaven.test.failure.ignore -s $MAVEN_SETTINGS_XML -DskipTests -Dversion=${appVersion}"
-                      sh "mvn deploy -s $MAVEN_SETTINGS_PRI_XML -f ${repoSubFolder}pom.xml -DskipTests -Dversion=${appVersion}"
-                    }
+                  configFileProvider([configFile(fileId: '', variable: 'MAVEN_SETTINGS_XML'),
+                                       configFile(fileId: '', variable: 'MAVEN_SETTINGS_2_XML')]) {
+                      
+                        withEnv(["JAVA_HOME=${jv_home}"]) {
+                          sh "mvn clean install -f ${repoSubFolder}pom.xml -B -Dmaven.test.failure.ignore -s $MAVEN_SETTINGS_XML -DskipTests -Dversion=${appVersion}"
+                          sh "mvn deploy -s $MAVEN_SETTINGS_XML -f ${repoSubFolder}pom.xml -DskipTests -Dversion=${appVersion}"
+                       
+                        }
+                   }
                 }
             }
         }
@@ -162,35 +172,40 @@ pipeline{
                 unstash 'osTemplates'
                 script {
                     openshiftAppName = "${appName}"
-                    openshift.withCluster( 'cloudmbdevui', "${openshiftDevOpsCredentials}" ){
+                    openshift.withCluster( 'cloudmbdevui', "${openshiftBuildCredentials}" ){
                     	openshift.withProject(project) {
-				 openshift.apply(openshift.process(readFile(file: "devops/OpenShiftTemplates/base-template.yaml"), "-p", "APP_NAME=${openshiftAppName}", "-p", "APP_VERSION=${appVersion}", "-p", "SOURCE_REPOSITORY_URL=${bitbucketSshUrl}", "-p", "BRANCH_NAME=${branchName}", "-p", "REGISTRY_URL=${nexusDockerRegistryUrl}", "-p", "NAME=${appName}"))
-                        	}
-                  	}
-                  	print "ARTIFACT URL:"
-                  	artifactUrl = artifactUrlPrefix + pomGroupId + "/${artifactId}/${appVersion}/${artifactId}-${appVersion}.jar"
-                  	print artifactUrl
-				
-                    withCredentials([usernamePassword(credentialsId: "${openshiftCredentials}", usernameVariable: 'NUSER', passwordVariable: 'NPASS')]) {
-                       sh """
-                       oc login --insecure-skip-tls-verify ${KUBERNETES_SERVICE_HOST}:443 -u ${NUSER} -p ${NPASS}
-                       oc project ${project}
-                       sh "oc set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion}  BRANCH_NAME=${branchName}
-                       sh "oc start-build ${appName} --from-dir ${repoSubFolder}. --follow"""
-                     }
+			    openshift.apply(openshift.process(readFile(file: "devops/OpenShiftTemplates/base-template.yaml"), "-p", "APP_NAME=${openshiftAppName}", "-p", "APP_VERSION=${appVersion}", "-p", "SOURCE_REPOSITORY_URL=${bitbucketSshUrl}", "-p", "BRANCH_NAME=${branchName}", "-p", "REGISTRY_URL=${nexusDockerRegistryUrl}", "-p", "NAME=${appName}"))
+                        	
+                            print "ARTIFACT URL:"
+                            artifactUrl = artifactUrlPrefix + pomGroupId + "/${artifactId}/${appVersion}/${artifactId}-${appVersion}.jar"
+                            print artifactUrl
+                                    
+                            if (branchName == "prod") {
+                                dir('appdynamics') {
+                                      git(url: "${appdynamicsUrl}", branch: "${appdynamicsUrlBranch}", credentialsId: "${openshiftCredentials}")
+                            	}  
+                          	openshift.raw("set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion} APPDYNAMICS_KEY=${appdynamicsAccessKey} BRANCH_NAME=${branchName}")
+                            }else{
+                                     
+                                openshift.raw("set env bc ${appName} APP_NAME=${artifactId} APP_VERSION=${appVersion}  BRANCH_NAME=${branchName}")
+                            }
+                        		    
+                            openshift.startBuild("${appName}", '--from-dir .', '--follow')
+                        }
+                    }
                 }
             }
         }
 
 
 
-        stage('Deploying to Dev Env') {
+        stage('Deploying to Cluster') {
             steps {
                   echo "Deploy is started!"
                   unstash 'osTemplates'
                   script {
                     openshiftAppName = "${appName}"
-                    openshift.withCluster( "${cluster}", "${openshiftEnvCredentials}" ){
+                    openshift.withCluster( "${cluster}", "${openshiftDeployCredentials}" ){
                         openshift.withProject(project) {
                                 openshift.apply(openshift.process(readFile(file: "devops/OpenShiftTemplates/deployment-template.yaml"),"-p", "MEMORY_LIMIT=${memoryLimit}","-p", "CPU_LIMIT=${cpuLimit}","-p", "APP_NAME=${openshiftAppName}", "-p", "APP_VERSION=${appVersion}", "-p", "ROUTE_PATH=${routePath}", "-p", "PROFILE_NAME=${profileName}", "-p", "NAME=${appName}", "-p", "REGISTRY_URL=${nexusDockerRegistryUrl}", "-p", "NAMESPACE=${project}", "-p", "HOST_NAME=${hostName}"))
                         }
