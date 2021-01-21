@@ -9,9 +9,9 @@ def openshiftCredentials = "OPENSHIFT_USER"
 def cluster = "CLUSTER" //default
 def devOpsProject = "DEVOPS_PROJECT"
 def project = "PROJECT"
-def devProject = "webstore"
-def testProject = "webstore-uat"
-def hotfixProject = "webstore-hf" 
+def devProject = "DEV_PROJECT"
+def testProject = "TEST_PROJECT"
+def hotfixProject = "HOTFIX_PROJECT" 
 
 
 def profileName = ""
